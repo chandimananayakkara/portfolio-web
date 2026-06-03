@@ -1,83 +1,135 @@
-import React, { useEffect, useRef } from 'react';
-
-const CONFIG = [
-  { speed: 30, opacity: 0.3, height: 12, width: 800 },
-  { speed: 50, opacity: 0.6, height: 12, width: 800 },
-  { speed: 20, opacity: 1, height: 6, width: 400 },
-];
-
-const updateWave = (waveElements: NodeListOf<Element>, index: number) => {
-  for (const key of Object.keys(CONFIG[index])) {
-    (waveElements[index] as HTMLElement).style.setProperty(
-      `--${key}`,
-      CONFIG[index][key as keyof typeof CONFIG[0]].toString()
-    );
-  }
-};
+import React, { useEffect } from 'react';
+import { useTheme } from './ThemeContext';
 
 export function WaveSeparator() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { isDark } = useTheme();
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const waveColor = isDark 
+      ? 'linear-gradient(180deg, rgba(96, 165, 250, 0.6), rgba(96, 165, 250, 0.2))'
+      : 'linear-gradient(180deg, rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.2))';
 
-    const WAVES = containerRef.current.querySelectorAll('.wave');
-    WAVES.forEach((_, index) => updateWave(WAVES, index));
+    // Remove old style if exists
+    const oldStyle = document.getElementById('wave-separator-styles');
+    if (oldStyle) oldStyle.remove();
 
-    // Inject styles
+    // Create and inject styles
     const style = document.createElement('style');
+    style.id = 'wave-separator-styles';
     style.textContent = `
-      .wave {
-        animation: wave calc(var(--speed, 0) * 1s) infinite linear;
-        background-image: url("https://assets.codepen.io/605876/wave--infinite.svg");
-        background-size: 50% 100%;
-        bottom: -5%;
-        height: calc(var(--height, 0) * 1vh);
-        left: 0;
-        opacity: var(--opacity);
-        position: absolute;
-        right: 0;
-        width: calc(var(--width, 0) * 1vw);
+      .wave-separator-container {
+        width: 100%;
+        position: relative;
+        z-index: 20;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        overflow: visible;
       }
-      @keyframes wave {
-        to {
-          transform: translate(-50%, 0);
+
+      .sea {
+        display: flex;
+        gap: 2;
+        filter: drop-shadow(0 -7px 10px rgba(255, 255, 255, 0.3)) blur(1px) contrast(3);
+        align-items: flex-end;
+        height:30px;
+        width: 100%;
+      }
+
+      .wave {
+        position: relative;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        overflow: visible;
+      }
+
+      .wave_graphic {
+        width: 8px;
+        height: 20px;
+        background: ${waveColor};
+        border-radius: 2px;
+      }
+
+      .wave_fade {
+        animation: fade 1400ms ease-in-out infinite alternate;
+      }
+
+      .wave_skew {
+        animation: skew 2000ms ease-in-out infinite alternate;
+      }
+
+      .wave_translate {
+        animation: translate 2000ms ease-in-out infinite alternate;
+      }
+
+      ${Array.from({ length: 100 }, (_, i) => {
+        const delay = i * -20;
+        return `
+          .wave:nth-child(${i + 1}) .wave_fade {
+            animation-delay: ${delay}ms;
+          }
+          .wave:nth-child(${i + 1}) .wave_skew {
+            animation-delay: ${delay}ms;
+          }
+          .wave:nth-child(${i + 1}) .wave_translate {
+            animation-delay: ${delay - 1000}ms;
+          }
+        `;
+      }).join('')}
+
+      @keyframes fade {
+        0% {
+          opacity: 0.05;
+        }
+        5% {
+          opacity: 0.05;
+        }
+        100% {
+          opacity: 1;
         }
       }
-      .wave:nth-of-type(1) {
-        --height: ${CONFIG[0].height};
-        --opacity: ${CONFIG[0].opacity};
-        --speed: ${CONFIG[0].speed};
-        --width: ${CONFIG[0].width};
+
+      @keyframes skew {
+        0% {
+          transform: skewY(-17.5deg);
+        }
+        100% {
+          transform: skewY(17.5deg);
+        }
       }
-      .wave:nth-of-type(2) {
-        --height: ${CONFIG[1].height};
-        --opacity: ${CONFIG[1].opacity};
-        --speed: ${CONFIG[1].speed};
-        --width: ${CONFIG[1].width};
-      }
-      .wave:nth-of-type(3) {
-        --height: ${CONFIG[2].height};
-        --opacity: ${CONFIG[2].opacity};
-        --speed: ${CONFIG[2].speed};
-        --width: ${CONFIG[2].width};
+
+      @keyframes translate {
+        0% {
+          transform: translateY(100px);
+        }
+        100% {
+          transform: translateY(-100px);
+        }
       }
     `;
     document.head.appendChild(style);
 
     return () => {
-      document.head.removeChild(style);
+      if (style) document.head.removeChild(style);
     };
-  }, []);
+  }, [isDark]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-24 overflow-hidden bg-gradient-to-b from-transparent to-transparent"
-    >
-      <div className="wave" />
-      <div className="wave" />
-      <div className="wave" />
+    <div className="wave-separator-container my-8 py-4">
+      <div className="sea">
+        {Array.from({ length: 100 }).map((_, i) => (
+          <div key={i} className="wave">
+            <div className="wave_fade">
+              <div className="wave_translate">
+                <div className="wave_skew">
+                  <div className="wave_graphic" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
