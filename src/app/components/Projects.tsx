@@ -81,7 +81,7 @@ export function Projects() {
                 onClick={() => setActiveCategory(category)}
                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
                   activeCategory === category 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' 
+                    ? 'bg-gradient-to-r from-purple-400 to-pink-500 text-white shadow-lg shadow-blue-500/30' 
                     : 'bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
               >
