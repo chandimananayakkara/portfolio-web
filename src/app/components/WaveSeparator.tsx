@@ -101,10 +101,10 @@ export function WaveSeparator() {
 
       @keyframes translate {
         0% {
-          transform: translateY(100px);
+          transform: translateY(50px);
         }
         100% {
-          transform: translateY(-100px);
+          transform: translateY(-50px);
         }
       }
     `;
