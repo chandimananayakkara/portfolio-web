@@ -98,7 +98,7 @@ export function Connect() {
                 <button
                   type="submit"
                   disabled={status !== 'idle'}
-                  className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 hover:bg-blue-700 text-white font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
                 >
                   {status === 'idle' && (
                     <>
