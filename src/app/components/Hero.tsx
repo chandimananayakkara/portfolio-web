@@ -9,7 +9,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 const Typewriter = ({
   text,
   delay = 0,
-  repeatInterval = 30000,
+  repeatInterval = 15000,
 }: {
   text: string;
   delay?: number;
