@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { SocialLinks } from "./SocialLinks";
 import profileImg from "../../imports/profile.png";
+import profileLightImg from "../../imports/profileLight.png";
+import { useTheme } from "./ThemeContext";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 const Typewriter = ({
@@ -20,7 +22,6 @@ const Typewriter = ({
     let timer: NodeJS.Timeout;
 
     if (!isTyping) {
-      // Wait for the repeat interval, then reset to type again
       timer = setTimeout(() => {
         setDisplayText("");
         setIsTyping(true);
@@ -29,7 +30,6 @@ const Typewriter = ({
     }
 
     let i = 0;
-    // Initial delay before starting typing
     const startDelay = setTimeout(() => {
       timer = setInterval(() => {
         if (i < text.length) {
@@ -40,7 +40,7 @@ const Typewriter = ({
           setIsTyping(false);
         }
       }, 100);
-    }, delay * 1000); // converting delay to ms
+    }, delay * 1000);
 
     return () => {
       clearTimeout(startDelay);
@@ -65,14 +65,101 @@ const Typewriter = ({
 };
 
 export function Hero() {
+  const { isDark } = useTheme();
+  const heroImage = isDark ? profileImg : profileLightImg;
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const appRef = useRef<any>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const randomColors = (count: number) =>
+      new Array(count).fill(0).map(
+        () =>
+          "#" +
+          Math.floor(Math.random() * 16777215)
+            .toString(16)
+            .padStart(6, "0"),
+      );
+
+    const handleBodyClick = () => {
+      const app = appRef.current;
+      if (!app?.tubes) return;
+
+      app.tubes.setColors(randomColors(3));
+      app.tubes.setLightsColors(randomColors(4));
+    };
+
+    const effectOptions = isDark
+      ? {
+          colors: ["#f967fb", "#53bc28", "#6958d5"],
+          lights: {
+            intensity: 200,
+            colors: ["#83f36e", "#fe8a2e", "#ff008a", "#60aed5"],
+          },
+          minRadius: 0.007,
+          maxRadius: 0.01,
+        }
+      : {
+          colors: ["#fae8c8", "#9dd8ff", "#d8b4fe"],
+          lights: {
+            intensity: 120,
+            colors: ["#fef3c7", "#bfdbfe", "#ede9fe", "#f8fafc"],
+          },
+          minRadius: 0.007,
+          maxRadius: 0.01,
+        };
+
+    async function initEffect() {
+      if (!canvasRef.current) return;
+
+      try {
+        const module =
+          await import(
+            "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js"
+          );
+        const TubesCursor = (module as any).default ?? (module as any);
+
+        if (!mounted || !TubesCursor) return;
+
+        const existingApp = appRef.current;
+        if (existingApp?.dispose) existingApp.dispose();
+        if (existingApp?.destroy) existingApp.destroy();
+
+        appRef.current = TubesCursor(canvasRef.current, {
+          tubes: effectOptions,
+        });
+
+        document.body.addEventListener("click", handleBodyClick);
+      } catch (error) {
+        console.error("Failed to load TubesCursor effect", error);
+      }
+    }
+
+    initEffect();
+
+    return () => {
+      mounted = false;
+      document.body.removeEventListener("click", handleBodyClick);
+
+      const app = appRef.current;
+      if (app?.dispose) app.dispose();
+      if (app?.destroy) app.destroy();
+    };
+  }, [isDark]);
+
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center pt-16 bg-transparent transition-colors relative z-10"
+      className="relative min-h-screen flex items-center pt-16 bg-gray-50 dark:bg-gray-950 transition-colors overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col-reverse lg:flex-row items-center gap-12">
-          {/* Text Content */}
           <div className="flex-1 space-y-8 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -114,7 +201,7 @@ export function Hero() {
             >
               <a
                 href="#projects"
-                className="px-8 py-3 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+                className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 text-white font-medium hover:from-purple-700 hover:via-pink-600 hover:to-pink-500 transition transform hover:scale-105 shadow-lg shadow-pink-500/30 focus:outline-none focus:ring-4 focus:ring-pink-300/30 dark:focus:ring-pink-700/40"
               >
                 View Work
               </a>
@@ -128,26 +215,23 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Image */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex-1 flex justify-center lg:justify-end lg:items-end relative"
           >
-           <motion.div
-  animate={{ y: [0, -15, 0] }}
-  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-  className="relative w-full max-w-[800px] h-[380px] md:h-[480px] lg:h-[560px] overflow-hidden rounded-3xl"
->
-  <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_top_right,_rgba(59,130,246,0.45),transparent_25%),radial-gradient(circle_at_bottom_left,_rgba(168,85,247,0.35),transparent_25%)] blur-3xl opacity-90 pointer-events-none" />
-  <div className="absolute inset-0 rounded-3xl shadow-[0_0_120px_rgba(59,130,246,0.25),0_0_80px_rgba(168,85,247,0.2)] pointer-events-none" />
-  <ImageWithFallback
-    src={profileImg}
-    alt="Chandima"
-    className="absolute inset-0 w-full h-full object-cover"
-  />
-</motion.div>
+            <motion.div
+              animate={{ y: [0, -15, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="relative w-full max-w-[800px] h-[380px] md:h-[480px] lg:h-[560px] overflow-hidden rounded-3xl"
+            >
+              <ImageWithFallback
+                src={heroImage}
+                alt="Chandima"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </motion.div>
           </motion.div>
         </div>
       </div>

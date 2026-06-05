@@ -6,9 +6,10 @@ import { motion } from 'motion/react';
 export function Navbar() {
   const links = [
     { name: 'Home', href: '#home' },
+    { name: 'About', href: '#about' },
     { name: 'Skills', href: '#skills' },
     { name: 'Projects', href: '#projects' },
-    { name: 'Connect Me', href: '#connect' },
+    { name: 'Contact Me', href: '#connect' },
   ];
 
   return (
@@ -39,6 +40,14 @@ export function Navbar() {
 
           <div className="flex items-center space-x-6">
             <SocialLinks className="hidden md:flex" />
+            
+            {/* <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button> */}
           </div>
         </div>
       </div>

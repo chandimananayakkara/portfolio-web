@@ -1,90 +1,256 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "./carousel";
+import aboutImage from "@/imports/1.png";
+
+const AUTO_PLAY_DELAY = 4200;
 
 export function About() {
+  const [emblaApi, setEmblaApi] = useState<CarouselApi | null>(null);
+  const [isInView, setIsInView] = useState(false);
+  const aboutRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      {
+        root: null,
+        threshold: 0.35,
+      },
+    );
+
+    if (aboutRef.current) {
+      observer.observe(aboutRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi || !isInView) return;
+
+    const timer = window.setTimeout(() => {
+      if (emblaApi.canScrollNext()) {
+        emblaApi.scrollNext();
+      } else {
+        emblaApi.scrollTo(0);
+      }
+    }, AUTO_PLAY_DELAY);
+
+    return () => window.clearTimeout(timer);
+  }, [emblaApi, isInView]);
+
   return (
     <section
+      ref={aboutRef}
       id="about"
-      className="min-h-screen flex items-center py-20 bg-transparent transition-colors relative"
+      className="min-h-screen py-12 md:py-20 bg-transparent transition-colors relative"
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="space-y-8"
-        >
-          {/* Section Title */}
-          <div>
-            <h2 className="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase text-sm mb-3">
-              About Me
-            </h2>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
-              Engineering Confidence Through Quality
-            </h1>
-          </div>
-
-          {/* Content Box with gradient border */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-8 md:gap-12 lg:gap-16 grid-cols-1 lg:grid-cols-2 items-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="relative p-8 md:p-10 rounded-2xl bg-white/5 dark:bg-white/5 backdrop-blur-sm border border-blue-200/30 dark:border-blue-400/30 shadow-lg"
+            className="overflow-hidden rounded-2xl md:rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_0_40px_rgba(168,85,247,0.5),0_0_80px_rgba(236,72,153,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.7),0_0_100px_rgba(236,72,153,0.4)] transition-shadow duration-500"
           >
-            {/* Decorative gradient blur */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <img
+              src={aboutImage}
+              alt="About Chandima"
+              className="w-full h-full object-cover min-h-[300px] md:min-h-[350px] lg:min-h-[420px]"
+            />
+          </motion.div>
 
-            <div className="relative space-y-6 text-gray-700 dark:text-gray-300">
-              {/* Paragraph 1 */}
-              <p className="text-xl leading-relaxed italic font-light text-gray-600 dark:text-gray-400 border-l-4 border-blue-600 dark:border-blue-400 pl-6">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+            className="space-y-4 md:space-y-6 lg:space-y-8"
+          >
+            <div>
+              <p className="text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-[0.3em] text-xs md:text-sm mb-2 md:mb-3">
+                About Me
+              </p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
+                Engineering Confidence Through Quality
+              </h2>
+            </div>
+
+            <div className="space-y-3 md:space-y-4 lg:space-y-6 text-gray-700 dark:text-gray-300">
+              <p className="text-base md:text-lg leading-relaxed">
                 Hi, I'm{" "}
                 <span className="font-semibold text-gray-900 dark:text-white">
                   Chandima Nanayakkara
                 </span>
-                . I believe that Quality Assurance is more than just catching
-                mistakes at the end of a pipeline—it's about engineering
-                confidence from day one. Currently pursuing my{" "}
+                . I believe Quality Assurance is more than just catching bugs —
+                it's about building confidence across the whole product lifecycle.
+              </p>
+              <p className="text-base md:text-lg leading-relaxed">
+                I am currently pursuing a{" "}
                 <span className="font-semibold text-gray-900 dark:text-white">
                   Bachelor of Information Technology (External)
                 </span>{" "}
-                at the{" "}
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  University of Moratuwa
-                </span>
-                , I approach testing with a developer's mindset and a user's
-                empathy.
-              </p>
-
-              {/* Paragraph 2 */}
-              <p className="text-xl leading-relaxed italic font-light text-gray-600 dark:text-gray-400 border-l-4 border-purple-600 dark:border-purple-400 pl-6">
-                My focus is on designing robust, maintainable automation
-                frameworks that allow development teams to move fast without
-                breaking things. I specialize in writing clean, reliable test
-                scripts using{" "}
-                <span className="font-semibold text-blue-600 dark:text-blue-400">
-                  Java, JavaScript, and TypeScript
-                </span>
-                , paired with modern automation tools like{" "}
-                <span className="font-semibold text-blue-600 dark:text-blue-400">
-                  Selenium, Cypress, and Playwright
-                </span>
-                .
-              </p>
-
-              {/* Paragraph 3 */}
-              <p className="text-xl leading-relaxed italic font-light text-gray-600 dark:text-gray-400 border-l-4 border-blue-600 dark:border-blue-400 pl-6">
-                I am currently seeking a QA Automation internship where I can
-                contribute to a culture of continuous quality, apply my academic
-                foundation to enterprise-level software, and learn how modern
-                teams scale their automated testing.
+                at the University of Moratuwa, and I enjoy turning manual testing
+                problems into automated solutions using modern tools.
               </p>
             </div>
+
+            <Carousel
+              setApi={setEmblaApi}
+              opts={{
+                align: "start",
+                containScroll: "trimSnaps",
+              }}
+            >
+              <CarouselContent className="flex gap-3 md:gap-4">
+                {/* Education */}
+                <CarouselItem className="min-w-[calc(100%-1rem)] sm:min-w-[320px] md:min-w-[340px] lg:min-w-[380px] rounded-lg md:rounded-[2rem] border border-white/10 bg-slate-50/80 dark:bg-slate-900/80 p-4 md:p-6 lg:p-8">
+                  <p className="text-xs uppercase tracking-[0.3em] text-purple-600 dark:text-purple-300 mb-3 font-bold">
+                    Education
+                  </p>
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
+                        Bachelor of Information Technology (External)
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        University of Moratuwa
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        2025 - Present
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white">
+                        School Education
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        St. Aloysius College — Galle
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">2013 - 2015</p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white">
+                        School Education
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        G. Christ Church Boys' College — Baddegama
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">2001 - 2015</p>
+                    </div>
+                  </div>
+                </CarouselItem>
+
+                {/* Certifications (scrollable) */}
+                <CarouselItem className="min-w-[calc(100%-1rem)] sm:min-w-[320px] md:min-w-[340px] lg:min-w-[380px] rounded-lg md:rounded-[2rem] border border-white/10 bg-slate-50/80 dark:bg-slate-900/80 p-4 md:p-6 lg:p-8">
+                  <p className="text-xs uppercase tracking-[0.3em] text-pink-600 dark:text-pink-300 mb-3 font-bold">
+                    Certifications
+                  </p>
+
+                  <div className="max-h-[300px] overflow-y-auto pr-3 space-y-4 cert-scroll">
+                    <CertificationRow
+                      title="Test Automation Foundations"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Java: Automated API Testing with REST Assured"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Postman Essential Training"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="API Testing Foundations"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Introduction to Maven"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Advanced JMeter"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Test Automation with Selenium WebDriver for Java"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Learning Jenkins: Automating Software Development and System Administration"
+                      issuer="LinkedIn"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="API Beginner"
+                      issuer="Postman"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="API Testing Path (v12)"
+                      issuer="Postman"
+                      date="May 2026"
+                    />
+                    <CertificationRow
+                      title="Python for Beginners"
+                      issuer="University of Moratuwa"
+                      date="2022"
+                    />
+                    <CertificationRow
+                      title="Web Design for Beginners"
+                      issuer="University of Moratuwa"
+                      date="2022"
+                    />
+                    <CertificationRow
+                      title="Flutter Fast Start Course"
+                      issuer="Franklin Training"
+                      date="2022"
+                    />
+                    <CertificationRow
+                      title="Cisco Certified Entry Networking Technician"
+                      issuer="Great Lake Holdings"
+                      date="2021"
+                    />
+                  </div>
+                </CarouselItem>
+              </CarouselContent>
+            </Carousel>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
+  );
+}
+
+function CertificationRow({
+  title,
+  issuer,
+  date,
+}: {
+  title: string;
+  issuer: string;
+  date: string;
+}) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+      <div>
+        <div className="text-sm font-semibold text-gray-900 dark:text-white">
+          {title}
+        </div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">{issuer}</div>
+      </div>
+      <div className="text-xs text-gray-400 mt-2 sm:mt-0">{date}</div>
+    </div>
   );
 }

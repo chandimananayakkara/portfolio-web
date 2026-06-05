@@ -81,7 +81,7 @@ export default function App() {
 
           <main className="flex-1">
             <Hero />
-            <WaveSeparator />
+            {/* <WaveSeparator /> */}
             <About />
             <WaveSeparator />
             <Skills />
