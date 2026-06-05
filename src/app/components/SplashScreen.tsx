@@ -24,7 +24,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         transition={{ duration: 0.8, type: "spring", bounce: 0.5 }}
         className="flex flex-col items-center gap-6"
       >
-        <Logo className="w-24 h-24 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
+        <Logo className="w-40 h-40 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
